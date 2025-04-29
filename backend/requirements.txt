@@ -1,0 +1,4 @@
+fastapi
+uvicorn[standard]
+numpy
+python-multipart # Add for CORS form data support
