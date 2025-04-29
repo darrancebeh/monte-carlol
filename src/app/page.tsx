@@ -322,10 +322,11 @@ export default function Home() {
     <main className="flex min-h-screen flex-col items-center justify-between p-6 md:p-12 lg:p-24 bg-gradient-to-br from-gray-900 to-gray-800 text-gray-100">
       <div className="z-10 w-full max-w-6xl items-center justify-between font-mono text-sm lg:flex flex-col">
 
-        <h1 className="text-4xl font-bold mb-4">Monte Carlo Stock Price Simulation</h1>
-        <p className="hidden lg:flex lg:flex-col lg:items-end">
-          <span className="text-lg">Using Geometric Brownian Motion (GBM)</span>
-        </p>
+        {/* Updated Header */}
+        <div className="flex items-baseline mb-4">
+          <h1 className="text-4xl font-bold mr-2">Monte Carlo Stock Price Simulation</h1>
+          <span className="text-lg text-gray-500">by db</span>
+        </div>
 
         {/* --- Input Form --- */}
         <form onSubmit={handleSubmit} className="w-full max-w-lg mb-10 p-6 bg-gray-800 rounded-lg shadow-xl grid grid-cols-1 sm:grid-cols-2 gap-4">
