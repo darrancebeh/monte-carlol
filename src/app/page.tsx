@@ -471,9 +471,9 @@ export default function Home() {
               <label htmlFor="initialPrice" className="mb-1 text-sm font-medium text-gray-400">Initial Price (S₀)</label>
               <input type="number" id="initialPrice" name="initialPrice" value={initialPrice} onChange={handleInputChange} required className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100" step="any" />
             </div>
-            {/* Expected Annual Return with % sign */}
+            {/* Expected Annual Return - Label updated, % sign styled */}
             <div className="flex flex-col">
-              <label htmlFor="expectedReturn" className="mb-1 text-sm font-medium text-gray-400">Expected Annual Return (μ %)</label>
+              <label htmlFor="expectedReturn" className="mb-1 text-sm font-medium text-gray-400">Expected Annual Return (μ)</label> {/* Removed % */}
               <div className="relative"> {/* Wrapper for positioning */}
                 <input
                   type="number"
@@ -483,18 +483,18 @@ export default function Home() {
                   onChange={handleInputChange}
                   required
                   // Added padding-right to avoid overlap
-                  className="w-full px-3 py-2 pr-6 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100"
+                  className="w-full px-3 py-2 pr-7 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100" // Increased pr
                   step="any"
                 />
-                {/* Positioned % sign */}
-                <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 pointer-events-none">
+                {/* Positioned % sign - Made more obvious */}
+                <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-300 text-lg pointer-events-none"> {/* Increased size, slightly lighter color */} 
                   %
                 </span>
               </div>
             </div>
-            {/* Annual Volatility with % sign */}
+            {/* Annual Volatility - Label updated, % sign styled */}
             <div className="flex flex-col">
-              <label htmlFor="volatility" className="mb-1 text-sm font-medium text-gray-400">Annual Volatility (σ %)</label>
+              <label htmlFor="volatility" className="mb-1 text-sm font-medium text-gray-400">Annual Volatility (σ)</label> {/* Removed % */}
               <div className="relative"> {/* Wrapper for positioning */}
                 <input
                   type="number"
@@ -504,11 +504,11 @@ export default function Home() {
                   onChange={handleInputChange}
                   required
                   // Added padding-right to avoid overlap
-                  className="w-full px-3 py-2 pr-6 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100"
+                  className="w-full px-3 py-2 pr-7 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100" // Increased pr
                   step="any"
                 />
-                {/* Positioned % sign */}
-                <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 pointer-events-none">
+                {/* Positioned % sign - Made more obvious */}
+                <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-300 text-lg pointer-events-none"> {/* Increased size, slightly lighter color */} 
                   %
                 </span>
               </div>
