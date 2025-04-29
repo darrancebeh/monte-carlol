@@ -454,13 +454,14 @@ export default function Home() {
              <span className="text-lg text-gray-500 ml-2 inline">by db</span> {/* Use inline and ml-2 for spacing */} 
           </div>
 
-          {/* Sub-header for Modal Trigger - Centered */}
+          {/* Sub-header for Modal Trigger - Centered, with Icon */}
           <div className="w-full max-w-6xl mb-6 text-center"> {/* Changed to text-center */} 
             <button
               onClick={() => setIsModalOpen(true)}
-              className="text-sm text-blue-400 hover:text-blue-300 hover:underline transition-colors duration-200"
+              className="text-sm text-blue-400 hover:text-blue-300 hover:underline transition-colors duration-200 inline-flex items-center" // Added inline-flex and items-center
               aria-label="What is Monte Carlo Simulation?"
             >
+              <FiInfo className="mr-1" /> {/* Added icon here */}
               What is Monte Carlo?
             </button>
           </div>
@@ -654,6 +655,7 @@ export default function Home() {
         overlayClassName="fixed inset-0 bg-black bg-opacity-75 z-40 flex items-center justify-center" // Added z-index lower than modal
       >
         <div className="flex justify-between items-center mb-4">
+          {/* Added FiInfo icon to the modal header */}
           <h2 className="text-xl sm:text-2xl font-semibold flex items-center">
             <FiInfo className="mr-2" /> What is Monte Carlo Simulation?
           </h2>
