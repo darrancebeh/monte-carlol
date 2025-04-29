@@ -307,9 +307,6 @@ export default function Home() {
       const results: SimulationResponse = await response.json();
       console.log("Received simulation results:", results);
       setSimulationData(results);
-      // Optionally start animation automatically after successful simulation
-      // setCurrentStep(0);
-      // setIsAnimating(true);
 
     } catch (err) {
       console.error("Simulation API call failed:", err);

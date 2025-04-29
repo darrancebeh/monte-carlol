@@ -24,8 +24,7 @@ class SimulationParams(BaseModel):
 # Define the response body model - ADDED STATS
 class SimulationResult(BaseModel):
     time_points: List[float]
-    # paths: List[List[float]] # Keep sample paths if needed, or remove
-    sample_paths: List[List[float]] # Return a small sample of paths
+    sample_paths: List[List[float]]
     mean_path: List[float]
     percentile_5th_path: List[float]
     percentile_95th_path: List[float]
