@@ -520,7 +520,7 @@ export default function Home() {
             </div>
             {/* Number of Steps */}
             <div className="flex flex-col">
-              <label htmlFor="numSteps" className="mb-1 text-sm font-medium text-gray-400">Number of Steps (e.g., 252)</label>
+              <label htmlFor="numSteps" className="mb-1 text-sm font-medium text-gray-400">Number of Steps/Days</label>
               <input type="number" id="numSteps" name="numSteps" value={numSteps} onChange={handleInputChange} required className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100" step="1" />
             </div>
             {/* Number of Paths */}
