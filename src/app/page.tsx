@@ -502,19 +502,19 @@ const SimulationChart = ({ chartData, samplePaths }: { chartData: any[], sampleP
   return (
     <div className="w-full h-96 mb-6"> {/* Ensure container has height */}
       <ResponsiveContainer width="100%" height="100%">
-        {/* Added isAnimationActive={false} to prevent Recharts default animations interfering */}
-        <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 20 }}>
+        {/* Increase bottom margin */}
+        <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 35 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#4B5563" />
           <XAxis
              dataKey="time"
              type="number"
-             // Set domain based on the *full* time range, not just current data
              domain={[chartData[0]?.time ?? 0, chartData[chartData.length - 1]?.time ?? 1]}
              tickFormatter={(tick) => tick.toFixed(2)}
-             label={{ value: 'Time (Years)', position: 'insideBottom', offset: -15, fill: '#9CA3AF' }}
+             // Adjust label offset for better spacing
+             label={{ value: 'Time (Years)', position: 'insideBottom', offset: -20, fill: '#9CA3AF' }}
              stroke="#9CA3AF"
              tick={{ fill: '#9CA3AF' }}
-             allowDataOverflow={true} // Important for animation
+             allowDataOverflow={true}
            />
           <YAxis
             domain={yDomain} // Use calculated or auto domain
@@ -522,16 +522,17 @@ const SimulationChart = ({ chartData, samplePaths }: { chartData: any[], sampleP
             stroke="#9CA3AF"
             tick={{ fill: '#9CA3AF' }}
             tickFormatter={(tick) => tick.toFixed(0)}
-            allowDataOverflow={true} // Important for animation
+            allowDataOverflow={true}
           />
           <Tooltip
              contentStyle={{ backgroundColor: '#374151', border: '1px solid #4B5563' }}
              labelStyle={{ color: '#E5E7EB' }}
              itemStyle={{ color: '#D1D5DB' }}
              formatter={(value: number) => value.toFixed(2)}
-             isAnimationActive={false} // Prevent tooltip animation interference
+             isAnimationActive={false}
            />
-          <Legend wrapperStyle={{ color: '#D1D5DB' }} />
+          {/* Position legend clearly at the bottom */}
+          <Legend verticalAlign="bottom" wrapperStyle={{ color: '#D1D5DB', paddingTop: '15px' }} />
 
           {/* Lines - Added isAnimationActive={false} */}
           <Line type="monotone" dataKey="mean" stroke="#34D399" strokeWidth={2} dot={false} name="Mean Path" isAnimationActive={false} />
