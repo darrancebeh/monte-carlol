@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { FiGithub, FiLinkedin, FiTwitter, FiMail } from 'react-icons/fi'; // Import icons
 
 // --- Helper Functions for Statistics ---
 const calculateMean = (arr: number[]): number | null => {
@@ -109,6 +110,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null); // New state for form errors
+  const currentYear = new Date().getFullYear(); // Get current year
 
   // --- Animation State ---
   const [currentStep, setCurrentStep] = useState<number>(0);
@@ -319,62 +321,66 @@ export default function Home() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-6 md:p-12 lg:p-24 bg-gradient-to-br from-gray-900 to-gray-800 text-gray-100">
-      <div className="z-10 w-full max-w-6xl items-center justify-between font-mono text-sm lg:flex flex-col">
+    // Ensure the main container is a flex column and takes at least the full screen height
+    <main className="flex min-h-screen flex-col items-center bg-gradient-to-br from-gray-900 to-gray-800 text-gray-100">
+      {/* Make the content container grow to push the footer down */}
+      <div className="flex flex-col items-center flex-grow w-full p-6 md:p-12 lg:p-24">
+        <div className="z-10 w-full max-w-6xl items-center justify-between font-mono text-sm lg:flex flex-col">
 
-        {/* Updated Header */}
-        <div className="flex items-baseline mb-4">
-          <h1 className="text-4xl font-bold mr-2">Monte Carlo Stock Price Simulation</h1>
-          <span className="text-lg text-gray-500">by db</span>
+          {/* Updated Header */}
+          <div className="flex items-baseline mb-4">
+            <h1 className="text-4xl font-bold mr-2">Monte Carlo Stock Price Simulation</h1>
+            <span className="text-lg text-gray-500">by db</span>
+          </div>
+
+          {/* --- Input Form --- */}
+          <form onSubmit={handleSubmit} className="w-full max-w-lg mb-10 p-6 bg-gray-800 rounded-lg shadow-xl grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex flex-col">
+              <label htmlFor="initialPrice" className="mb-1 text-sm font-medium text-gray-400">Initial Price (S₀)</label>
+              <input type="number" id="initialPrice" name="initialPrice" value={initialPrice} onChange={handleInputChange} required className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100" />
+            </div>
+            <div className="flex flex-col">
+              <label htmlFor="expectedReturn" className="mb-1 text-sm font-medium text-gray-400">Expected Annual Return (μ)</label>
+              <input type="number" id="expectedReturn" name="expectedReturn" value={expectedReturn} onChange={handleInputChange} required className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100" />
+            </div>
+            <div className="flex flex-col">
+              <label htmlFor="volatility" className="mb-1 text-sm font-medium text-gray-400">Annual Volatility (σ)</label>
+              <input type="number" id="volatility" name="volatility" value={volatility} onChange={handleInputChange} required className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100" />
+            </div>
+            <div className="flex flex-col">
+              <label htmlFor="timeHorizon" className="mb-1 text-sm font-medium text-gray-400">Time Horizon (T, years)</label>
+              <input type="number" id="timeHorizon" name="timeHorizon" value={timeHorizon} onChange={handleInputChange} required className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100" />
+            </div>
+            {/* Number of Steps */}
+            <div className="flex flex-col">
+              <label htmlFor="numSteps" className="mb-1 text-sm font-medium text-gray-400">Number of Steps (e.g., 252)</label>
+              <input type="number" id="numSteps" name="numSteps" value={numSteps} onChange={handleInputChange} required className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100" />
+            </div>
+            <div className="flex flex-col">
+              <label htmlFor="numPaths" className="mb-1 text-sm font-medium text-gray-400">Number of Paths (M)</label>
+              <input type="number" id="numPaths" name="numPaths" value={numPaths} onChange={handleInputChange} required className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100" />
+            </div>
+
+            {/* Form Error Display */}
+            {formError && (
+              <div className="text-red-500 text-sm mt-2">
+                {formError}
+              </div>
+            )}
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ? 'Simulating...' : 'Run Simulation'}
+            </button>
+          </form>
         </div>
 
-        {/* --- Input Form --- */}
-        <form onSubmit={handleSubmit} className="w-full max-w-lg mb-10 p-6 bg-gray-800 rounded-lg shadow-xl grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="flex flex-col">
-            <label htmlFor="initialPrice" className="mb-1 text-sm font-medium text-gray-400">Initial Price (S₀)</label>
-            <input type="number" id="initialPrice" name="initialPrice" value={initialPrice} onChange={handleInputChange} required className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100" />
-          </div>
-          <div className="flex flex-col">
-            <label htmlFor="expectedReturn" className="mb-1 text-sm font-medium text-gray-400">Expected Annual Return (μ)</label>
-            <input type="number" id="expectedReturn" name="expectedReturn" value={expectedReturn} onChange={handleInputChange} required className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100" />
-          </div>
-          <div className="flex flex-col">
-            <label htmlFor="volatility" className="mb-1 text-sm font-medium text-gray-400">Annual Volatility (σ)</label>
-            <input type="number" id="volatility" name="volatility" value={volatility} onChange={handleInputChange} required className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100" />
-          </div>
-          <div className="flex flex-col">
-            <label htmlFor="timeHorizon" className="mb-1 text-sm font-medium text-gray-400">Time Horizon (T, years)</label>
-            <input type="number" id="timeHorizon" name="timeHorizon" value={timeHorizon} onChange={handleInputChange} required className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100" />
-          </div>
-          {/* Number of Steps */}
-          <div className="flex flex-col">
-            <label htmlFor="numSteps" className="mb-1 text-sm font-medium text-gray-400">Number of Steps (e.g., 252)</label>
-            <input type="number" id="numSteps" name="numSteps" value={numSteps} onChange={handleInputChange} required className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100" />
-          </div>
-          <div className="flex flex-col">
-            <label htmlFor="numPaths" className="mb-1 text-sm font-medium text-gray-400">Number of Paths (M)</label>
-            <input type="number" id="numPaths" name="numPaths" value={numPaths} onChange={handleInputChange} required className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100" />
-          </div>
-
-          {/* Form Error Display */}
-          {formError && (
-            <div className="text-red-500 text-sm mt-2">
-              {formError}
-            </div>
-          )}
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isLoading ? 'Simulating...' : 'Run Simulation'}
-          </button>
-        </form>
-
         {/* Results Display Section */}
-        <div className="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 min-h-[400px] flex flex-col justify-center w-full max-w-6xl">
+        <div className="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 min-h-[400px] flex flex-col justify-center w-full max-w-6xl mt-10"> {/* Added mt-10 for spacing */}
           <h2 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-200">Simulation Results</h2>
           {/* Loading State */}
           {isLoading && (
@@ -420,8 +426,55 @@ export default function Home() {
         </div>
       </div>
 
-      <footer className="text-center mt-12 text-sm text-gray-500">
-        <p>Monte Carlo Simulation Tool - {new Date().getFullYear()}</p>
+      {/* New Footer */}
+      <footer
+        className="w-full py-4 px-4 sm:px-8 bg-gray-900 bg-opacity-70 text-gray-400 text-sm border-t border-gray-700 backdrop-blur-sm" // Adjusted styling slightly
+      >
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4"> {/* Reduced gap */}
+          <div className="flex gap-5">
+            <a
+              href="https://github.com/darrancebeh"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="GitHub Profile"
+              className="transition-colors duration-300 hover:text-gray-200"
+            >
+              <FiGithub className="w-5 h-5" />
+            </a>
+            <a
+              href="https://linkedin.com/in/darrancebeh"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="LinkedIn Profile"
+              className="transition-colors duration-300 hover:text-gray-200"
+            >
+              <FiLinkedin className="w-5 h-5" />
+            </a>
+            <a
+              href="https://x.com/quant_in_my" // Assuming this is the correct handle
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="X Profile"
+              className="transition-colors duration-300 hover:text-gray-200"
+            >
+              <FiTwitter className="w-5 h-5" />
+            </a>
+            <a
+              href="mailto:darrancebeh@gmail.com"
+              aria-label="Send Email"
+              className="transition-colors duration-300 hover:text-gray-200"
+            >
+              <FiMail className="w-5 h-5" />
+            </a>
+          </div>
+
+          <div className="text-center sm:text-right">
+            <p>&copy; {currentYear} Darrance Beh Heng Shek. All Rights Reserved.</p>
+            <p className="text-xs text-gray-500 mt-1">
+              Built with Next.js, React, FastAPI, Pydantic, Recharts, and Tailwind CSS.
+            </p>
+          </div>
+        </div>
       </footer>
     </main>
   );
