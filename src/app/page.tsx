@@ -208,8 +208,8 @@ const StatisticsDisplay = ({ currentStats, time }: { currentStats: CurrentStats,
 // --- Main Component ---
 export default function Home() {
   const [initialPrice, setInitialPrice] = useState<string>('100');
-  const [expectedReturn, setExpectedReturn] = useState<string>('0.05'); // 5%
-  const [volatility, setVolatility] = useState<string>('0.2'); // 20%
+  const [expectedReturn, setExpectedReturn] = useState<string>('5'); // Changed to percentage: 5%
+  const [volatility, setVolatility] = useState<string>('20'); // Changed to percentage: 20%
   const [timeHorizon, setTimeHorizon] = useState<string>('1'); // 1 year
   const [numSteps, setNumSteps] = useState<string>('252'); // Trading days in a year
   const [numPaths, setNumPaths] = useState<string>('100'); // Number of simulations
@@ -340,8 +340,9 @@ export default function Home() {
 
     // --- Input Validation ---
     const parsedInitialPrice = parseFloat(initialPrice);
-    const parsedExpectedReturn = parseFloat(expectedReturn);
-    const parsedVolatility = parseFloat(volatility);
+    // Parse percentage inputs
+    let parsedExpectedReturn = parseFloat(expectedReturn);
+    let parsedVolatility = parseFloat(volatility);
     const parsedTimeHorizon = parseFloat(timeHorizon);
     const parsedNumSteps = parseInt(numSteps, 10);
     const parsedNumPaths = parseInt(numPaths, 10);
@@ -351,9 +352,10 @@ export default function Home() {
     if (isNaN(parsedInitialPrice) || parsedInitialPrice <= 0) {
       validationError = "Initial Price must be a positive number.";
     } else if (isNaN(parsedExpectedReturn)) {
-       validationError = "Expected Return must be a number.";
+       validationError = "Expected Return must be a number (%)."; // Updated error message
     } else if (isNaN(parsedVolatility) || parsedVolatility < 0) {
-       validationError = "Volatility must be a non-negative number.";
+       // Volatility can be 0, but not negative
+       validationError = "Volatility must be a non-negative number (%)."; // Updated error message
     } else if (isNaN(parsedTimeHorizon) || parsedTimeHorizon <= 0) {
        validationError = "Time Horizon must be a positive number.";
     } else if (isNaN(parsedNumSteps) || parsedNumSteps <= 0) {
@@ -369,16 +371,20 @@ export default function Home() {
     }
     // --- End Input Validation ---
 
+    // Convert percentages to decimals BEFORE sending to backend
+    parsedExpectedReturn = parsedExpectedReturn / 100;
+    parsedVolatility = parsedVolatility / 100;
+
     const params = {
       initialPrice: parsedInitialPrice,
-      expectedReturn: parsedExpectedReturn,
-      volatility: parsedVolatility,
+      expectedReturn: parsedExpectedReturn, // Use converted value
+      volatility: parsedVolatility,         // Use converted value
       timeHorizon: parsedTimeHorizon,
       numSteps: parsedNumSteps,
       numPaths: parsedNumPaths,
     };
 
-    console.log("Running simulation with params:", params);
+    console.log("Running simulation with params (percentages converted to decimals):", params);
 
     // --- API Call ---
     try {
@@ -387,7 +393,7 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        // Ensure all parameters are numbers before sending
+        // Send the converted decimal values
         body: JSON.stringify({
             initialPrice: params.initialPrice,
             expectedReturn: params.expectedReturn,
@@ -465,14 +471,49 @@ export default function Home() {
               <label htmlFor="initialPrice" className="mb-1 text-sm font-medium text-gray-400">Initial Price (S₀)</label>
               <input type="number" id="initialPrice" name="initialPrice" value={initialPrice} onChange={handleInputChange} required className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100" step="any" />
             </div>
+            {/* Expected Annual Return with % sign */}
             <div className="flex flex-col">
-              <label htmlFor="expectedReturn" className="mb-1 text-sm font-medium text-gray-400">Expected Annual Return (μ)</label>
-              <input type="number" id="expectedReturn" name="expectedReturn" value={expectedReturn} onChange={handleInputChange} required className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100" step="any" />
+              <label htmlFor="expectedReturn" className="mb-1 text-sm font-medium text-gray-400">Expected Annual Return (μ %)</label>
+              <div className="relative"> {/* Wrapper for positioning */}
+                <input
+                  type="number"
+                  id="expectedReturn"
+                  name="expectedReturn"
+                  value={expectedReturn}
+                  onChange={handleInputChange}
+                  required
+                  // Added padding-right to avoid overlap
+                  className="w-full px-3 py-2 pr-6 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100"
+                  step="any"
+                />
+                {/* Positioned % sign */}
+                <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 pointer-events-none">
+                  %
+                </span>
+              </div>
             </div>
+            {/* Annual Volatility with % sign */}
             <div className="flex flex-col">
-              <label htmlFor="volatility" className="mb-1 text-sm font-medium text-gray-400">Annual Volatility (σ)</label>
-              <input type="number" id="volatility" name="volatility" value={volatility} onChange={handleInputChange} required className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100" step="any" />
+              <label htmlFor="volatility" className="mb-1 text-sm font-medium text-gray-400">Annual Volatility (σ %)</label>
+              <div className="relative"> {/* Wrapper for positioning */}
+                <input
+                  type="number"
+                  id="volatility"
+                  name="volatility"
+                  value={volatility}
+                  onChange={handleInputChange}
+                  required
+                  // Added padding-right to avoid overlap
+                  className="w-full px-3 py-2 pr-6 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100"
+                  step="any"
+                />
+                {/* Positioned % sign */}
+                <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 pointer-events-none">
+                  %
+                </span>
+              </div>
             </div>
+            {/* Time Horizon */}
             <div className="flex flex-col">
               <label htmlFor="timeHorizon" className="mb-1 text-sm font-medium text-gray-400">Time Horizon (T, years)</label>
               <input type="number" id="timeHorizon" name="timeHorizon" value={timeHorizon} onChange={handleInputChange} required className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100" step="any" />
@@ -482,6 +523,7 @@ export default function Home() {
               <label htmlFor="numSteps" className="mb-1 text-sm font-medium text-gray-400">Number of Steps (e.g., 252)</label>
               <input type="number" id="numSteps" name="numSteps" value={numSteps} onChange={handleInputChange} required className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100" step="1" />
             </div>
+            {/* Number of Paths */}
             <div className="flex flex-col">
               <label htmlFor="numPaths" className="mb-1 text-sm font-medium text-gray-400">Number of Paths (M)</label>
               <input type="number" id="numPaths" name="numPaths" value={numPaths} onChange={handleInputChange} required className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100" step="1" />
