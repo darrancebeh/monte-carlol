@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { FiGithub, FiLinkedin, FiTwitter, FiMail, FiInfo } from 'react-icons/fi'; // Import icons
 import Modal from 'react-modal'; // Import Modal
@@ -100,8 +100,8 @@ const COLORS = ["#8884d8", "#82ca9d", "#ffc658", "#ff7300", "#00C49F", "#FFBB28"
 
 // --- Helper Components ---
 
-// Chart Component using Recharts - Modified to accept chartData directly
-const SimulationChart = ({ chartData, samplePaths }: { chartData: any[], samplePaths: number[][] }) => {
+// Chart Component using Recharts - Modified to accept chartData directly and numSteps
+const SimulationChart = ({ chartData, samplePaths, numSteps }: { chartData: any[], samplePaths: number[][], numSteps: number }) => {
   // Basic check for empty data
   if (!chartData || chartData.length === 0) {
     // Show a message or a static empty chart structure if needed during initial load/reset
@@ -127,9 +127,10 @@ const SimulationChart = ({ chartData, samplePaths }: { chartData: any[], sampleP
              dataKey="time"
              type="number"
              domain={[chartData[0]?.time ?? 0, chartData[chartData.length - 1]?.time ?? 1]}
-             tickFormatter={(tick) => tick.toFixed(2)}
+             // Format ticks to show days instead of years
+             tickFormatter={(tick) => (tick * numSteps).toFixed(0)} // Multiply years by steps for days
              // Adjust label offset for better spacing
-             label={{ value: 'Time (Years)', position: 'insideBottom', offset: -20, fill: '#9CA3AF' }}
+             label={{ value: 'Time (Days)', position: 'insideBottom', offset: -20, fill: '#9CA3AF' }} // Changed label
              stroke="#9CA3AF"
              tick={{ fill: '#9CA3AF' }}
              allowDataOverflow={true}
@@ -149,8 +150,17 @@ const SimulationChart = ({ chartData, samplePaths }: { chartData: any[], sampleP
              formatter={(value: number) => value.toFixed(2)}
              isAnimationActive={false}
            />
-          {/* Position legend clearly at the bottom */}
-          <Legend verticalAlign="bottom" wrapperStyle={{ color: '#D1D5DB', paddingTop: '15px' }} />
+          {/* Position legend vertically on the right */}
+          <Legend
+            layout="vertical" // Set layout to vertical
+            verticalAlign="middle" // Align vertically in the middle
+            align="right" // Align to the right side
+            wrapperStyle={{
+              color: '#D1D5DB',
+              paddingLeft: '10px', // Add padding to the left of the legend
+              // Removed top/bottom padding, textAlign
+            }}
+          />
 
           {/* Lines - Added isAnimationActive={false} */}
           <Line type="monotone" dataKey="mean" stroke="#34D399" strokeWidth={2} dot={false} name="Mean Path" isAnimationActive={false} />
@@ -220,6 +230,11 @@ export default function Home() {
   const [formError, setFormError] = useState<string | null>(null); // New state for form errors
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false); // State for modal
   const currentYear = new Date().getFullYear(); // Get current year
+
+  // --- Parsed Numeric State (Memoized) ---
+  // Memoize parsed numeric values to avoid recalculating on every render
+  // and ensure SimulationChart gets a stable number for numSteps
+  const parsedNumSteps = useMemo(() => parseInt(numSteps, 10) || 252, [numSteps]);
 
   // --- Animation State ---
   const [currentStep, setCurrentStep] = useState<number>(0);
@@ -291,11 +306,11 @@ export default function Home() {
     };
   }, [isAnimating, simulationData, animationSpeed]);
 
-  // Reset animation when new data is loaded
+  // Reset animation when new data is loaded or numSteps changes
   useEffect(() => {
     handleReset();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [simulationData]);
+  }, [simulationData, parsedNumSteps]); // Add parsedNumSteps dependency
 
   // --- Data Preparation for Chart (Memoized) ---
   const animatedChartData = useMemo(() => {
@@ -344,7 +359,8 @@ export default function Home() {
     let parsedExpectedReturn = parseFloat(expectedReturn);
     let parsedVolatility = parseFloat(volatility);
     const parsedTimeHorizon = parseFloat(timeHorizon);
-    const parsedNumSteps = parseInt(numSteps, 10);
+    // Use the memoized parsedNumSteps here
+    // const parsedNumSteps = parseInt(numSteps, 10);
     const parsedNumPaths = parseInt(numPaths, 10);
 
     let validationError = null;
@@ -358,7 +374,7 @@ export default function Home() {
        validationError = "Volatility must be a non-negative number (%)."; // Updated error message
     } else if (isNaN(parsedTimeHorizon) || parsedTimeHorizon <= 0) {
        validationError = "Time Horizon must be a positive number.";
-    } else if (isNaN(parsedNumSteps) || parsedNumSteps <= 0) {
+    } else if (isNaN(parsedNumSteps) || parsedNumSteps <= 0) { // Use memoized value for check
        validationError = "Time Steps must be a positive integer.";
     } else if (isNaN(parsedNumPaths) || parsedNumPaths <= 0) {
        validationError = "Number of Paths must be a positive integer.";
@@ -380,7 +396,7 @@ export default function Home() {
       expectedReturn: parsedExpectedReturn, // Use converted value
       volatility: parsedVolatility,         // Use converted value
       timeHorizon: parsedTimeHorizon,
-      numSteps: parsedNumSteps,
+      numSteps: parsedNumSteps, // Send the parsed number
       numPaths: parsedNumPaths,
     };
 
@@ -585,8 +601,8 @@ export default function Home() {
                       </span>
                   </div>
 
-                 {/* Pass animated data to the chart */}
-                 <SimulationChart chartData={animatedChartData} samplePaths={simulationData.sample_paths || []} />
+                 {/* Pass animated data and parsedNumSteps to the chart */}
+                 <SimulationChart chartData={animatedChartData} samplePaths={simulationData.sample_paths || []} numSteps={parsedNumSteps} />
                  {/* Pass current step stats to the display */}
                  <StatisticsDisplay currentStats={currentStepStats} time={simulationData.time_points[currentStep]} />
                </div>
